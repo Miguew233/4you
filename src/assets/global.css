@@ -1,0 +1,89 @@
+/* ===========================
+      RESET + NORMALIZE
+=========================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: #ffffff;
+    color: #333;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* remove decoração de links */
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  /* remove bullets de listas */
+  ul, li {
+    list-style: none;
+  }
+  
+  /* imagens responsivas */
+  img {
+    max-width: 100%;
+    display: block;
+  }
+  
+  /* botões padronizados */
+  button {
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  
+  /* inputs */
+  input, select, textarea {
+    font-family: inherit;
+    outline: none;
+  }
+  
+  /* ===========================
+        VARIÁVEIS (opcionais)
+  =========================== */
+  :root {
+    --primary: #007bff;
+    --primary-dark: #0056b3;
+    --text-light: #ffffff;
+    --text-dark: #222222;
+    --radius: 8px;
+  }
+  
+  /* ===========================
+        CLASSES ÚTEIS
+  =========================== */
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+  
+  .center {
+    text-align: center;
+  }
+  
+  .hidden {
+    display: none;
+  }
+  
+  .flex {
+    display: flex;
+  }
+  
+  .flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  

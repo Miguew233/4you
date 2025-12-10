@@ -4,7 +4,7 @@
 </script>
 
 <template>
-  <Header />
+   <Header />
   <HeroSection />
   <p>
     
