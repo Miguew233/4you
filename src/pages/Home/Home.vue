@@ -1,0 +1,895 @@
+<template>
+  <section class="hero">
+    <div class="overlay"></div>
+    <div class="hero-content">
+      <h1><span><img src="../../icons/Maleta.png" alt=""></span>Pacotes de Viagem</h1>
+      <p>Confira os pacotes de viagens nacionais e internacionais</p>
+    </div>
+    <div class="container-card">
+      <Swiper :slides-per-view="3" :space-between="20" :navigation="true" :loop="true" :breakpoints="{
+        0: { slidesPerView: 1.1 },
+        600: { slidesPerView: 2.2 },
+        1024: { slidesPerView: 3 }
+      }" class="travel-swiper">
+        <SwiperSlide v-for="(card, index) in travelCards" :key="index">
+          <div class="travel-card">
+            <img :src="card.image" class="card-image" />
+
+            <div class="card-info">
+              <h3>{{ card.city }}</h3>
+              <p class="date">{{ card.date }}</p>
+              <p class="price">A partir de R$: <span>{{ card.price }}</span></p>
+            </div>
+          </div>
+        </SwiperSlide>
+      </Swiper>
+
+    </div>
+    <div class="confira-promocoes">
+      <h3>Confira as promoções de hotéis!</h3>
+      <span class="arrow">
+        <img src="../../icons/DoubleUp.png" alt="">
+      </span>
+    </div>
+
+  </section>
+
+  <section class="find-section">
+    <h2 class="title">Encontre seu destino</h2>
+
+    <div class="inputs-container">
+      <!-- ORIGEM / DESTINO -->
+      <div class="input-group">
+        <label>Selecione :</label>
+        <div class="input-box">
+          <div class="input-item">
+            <span class="icon">📍</span>
+            <input type="text" placeholder="Origem" v-model="origin">
+          </div>
+          <div class="divider"></div>
+          <div class="input-item">
+            <span class="icon">📍</span>
+            <input type="text" placeholder="Destino" v-model="destination">
+          </div>
+        </div>
+      </div>
+
+      <!-- DATAS -->
+      <div class="input-group">
+        <label>Selecione :</label>
+        <div class="input-box">
+          <div class="input-item">
+            <span class="icon">📅</span>
+            <input type="date" v-model="dateStart">
+          </div>
+          <div class="divider"></div>
+          <div class="input-item">
+            <span class="icon">📅</span>
+            <input type="date" v-model="dateEnd">
+          </div>
+        </div>
+      </div>
+
+      <!-- QUARTOS / VIAJANTES -->
+      <div class="input-group">
+        <label>Selecione :</label>
+        <div class="input-box">
+          <div class="input-item">
+            <span class="icon">🚗</span>
+            <input type="number" min="1" placeholder="Quartos" v-model="rooms">
+          </div>
+          <div class="divider"></div>
+          <div class="input-item">
+            <span class="icon">👥</span>
+            <input type="number" min="1" placeholder="Viajantes" v-model="travellers">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button class="search-btn">
+      Buscar destino ➜
+    </button>
+  </section>
+
+  <div class="home-container">
+
+    <section class="promo-section">
+      <div class="header-section">
+        <h2>🛌 Hotéis em PROMO!</h2>
+        <p>Confira as promoções de hotéis nacionais e internacionais</p>
+      </div>
+
+      <Swiper :modules="modules" :slides-per-view="3" :space-between="20" :navigation="true" :loop="true" :breakpoints="{
+        0: { slidesPerView: 1.1, spaceBetween: 10 },
+        600: { slidesPerView: 2.2, spaceBetween: 15 },
+        1024: { slidesPerView: 4, spaceBetween: 20 }
+      }" class="travel-swiper">
+        <SwiperSlide v-for="hotel in hoteisList" :key="hotel.id">
+          <TravelCard :info="hotel" />
+        </SwiperSlide>
+      </Swiper>
+    </section>
+
+
+    <section class="promo-section">
+      <div class="header-section">
+        <h2>✈️ Passagens Aéreas PROMO!</h2>
+        <p>Confira as promoções de passagens de viagens nacionais e internacionais</p>
+      </div>
+
+      <Swiper :modules="modules" :slides-per-view="3" :space-between="20" :navigation="true" :loop="true" :breakpoints="{
+        0: { slidesPerView: 1.1, spaceBetween: 10 },
+        600: { slidesPerView: 2.2, spaceBetween: 15 },
+        1024: { slidesPerView: 4, spaceBetween: 20 }
+      }" class="travel-swiper">
+        <SwiperSlide v-for="passagem in passagensList" :key="passagem.id">
+          <TravelCard :info="passagem" />
+        </SwiperSlide>
+      </Swiper>
+    </section>
+
+  </div>
+
+  <section class="info-section">
+    <div class="section-header">
+      <h2>👥 Parceiros</h2>
+    </div>
+    <p class="section-desc">
+      Uma parceria inesquecível: CVC, 123Milhas e Localiza - Viaje com:
+      <strong>conforto, economia e tranquilidade!</strong>
+    </p>
+
+    <div class="partners-logos">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/e/e6/Cvc-logo.svg" alt="CVC">
+      <img src="https://logodownload.org/wp-content/uploads/2014/02/123-milhas-logo-0.png" alt="123 Milhas">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/1/1a/Localiza_logo.svg" alt="Localiza">
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <section class="info-section">
+    <div class="section-header">
+      <h2>💳 Formas de pagamento</h2>
+    </div>
+    <p class="section-desc">
+      Viaje com liberdade e comodidade: <u>Visa, Mastercard, Boleto, American Express, Hipercard e Diners.</u>
+    </p>
+    <h3 class="cta-text">Escolha seu método de pagamento e embarque rumo às melhores experiências!</h3>
+
+    <div class="payment-warning">
+      <span class="info-icon">ℹ️</span>
+      Aceitamos cartão de crédito apenas nas lojas físicas
+    </div>
+
+    <div class="payment-logos">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa">
+      <img
+        src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png"
+        alt="Mastercard">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/American_Express_logo_%282018%29.svg" alt="Amex">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/d/d2/Hipercard_logo.svg" alt="Hipercard">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Diners_Club_Logo3.svg" alt="Diners">
+      <div class="boleto-icon">📄 Boleto</div>
+    </div>
+  </section>
+
+  <section class="contact-section">
+    <div class="contact-text">
+      <h3>Estamos aqui para ajudar!</h3>
+      <p>Nosso suporte está disponível em <u>horário comercial</u>, pronto para responder suas perguntas.</p>
+      <p class="small-text">Sua satisfação é nossa prioridade!</p>
+    </div>
+
+    <div class="contact-form">
+      <h4>Envie sua mensagem</h4>
+      <form @submit.prevent="sendMessage">
+        <div class="form-group">
+          <input type="text" placeholder="Seu Nome" v-model="contactName" required />
+        </div>
+        <div class="form-group">
+          <input type="email" placeholder="Seu E-mail" v-model="contactEmail" required />
+        </div>
+        <div class="form-group">
+          <textarea placeholder="Como podemos ajudar?" v-model="contactMessage" rows="4" required></textarea>
+        </div>
+        <button type="submit" class="btn-send">Enviar Mensagem</button>
+      </form>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { ref } from 'vue';
+
+// 1. Imports do Swiper
+import { Swiper, SwiperSlide } from 'swiper/vue';
+import { Navigation } from 'swiper/modules';
+
+// 2. Imports de CSS do Swiper
+import 'swiper/css';
+import 'swiper/css/navigation';
+
+// 3. Import do seu Componente
+import TravelCard from "@/components/Cards/TravelCard.vue";
+
+// 4. Configuração dos Módulos (Isso resolve o erro de constructor)
+const modules = [Navigation];
+
+// 5. Seus dados (substituindo o data() antigo)
+const travelCards = ref([
+  {
+    city: "Maceió",
+    date: "28 de ago - 31 de ago",
+    price: "1.629",
+    image: "https://i.imgur.com/r4ZQ0K4.jpeg"
+  },
+  {
+    city: "Fortaleza",
+    date: "17 de jun - 21 de jun",
+    price: "1.927",
+    image: "https://i.imgur.com/Ynk1xhK.jpeg"
+  },
+  {
+    city: "Rio de Janeiro",
+    date: "06 de ago - 09 de ago",
+    price: "535",
+    image: "https://i.imgur.com/Y2s2ypU.jpeg"
+  },
+  {
+    city: "Oslo",
+    date: "03 de jun - 09 de jun",
+    price: "4.243",
+    image: "https://i.imgur.com/aA3xzqg.jpeg"
+  }
+]);
+
+const hoteisList = ref([
+  {
+    id: 1,
+    type: 'hotel',
+    name: "Hotel Golden Vilage",
+    location: "São Paulo, SP",
+    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=300&q=80",
+    price: 616.00,
+    days: 4,
+    guests: 2,
+    hasBreakfast: true,
+    hasWifi: true
+  },
+  {
+    id: 2,
+    type: 'hotel',
+    name: "Majestic Palace Hotel",
+    location: "Florianópolis, SC",
+    image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=300&q=80",
+    price: 2185.00,
+    days: 7,
+    guests: 2,
+    hasBreakfast: true,
+    hasWifi: true
+  },
+  {
+    id: 3,
+    type: 'hotel',
+    name: "Crowne Plaza LA",
+    location: "Los Angeles, EUA",
+    image: "https://images.unsplash.com/photo-1564501049412-61c2a3083791?auto=format&fit=crop&w=300&q=80",
+    price: 4152.00,
+    days: 7,
+    guests: 2,
+    hasBreakfast: false,
+    hasWifi: true
+  },
+  {
+    id: 4,
+    type: 'hotel',
+    name: "EVEN Hotel Miami",
+    location: "Miami, EUA",
+    image: "https://images.unsplash.com/photo-1571896349842-6e53ce41e8f2?auto=format&fit=crop&w=300&q=80",
+    price: 2873.00,
+    days: 5,
+    guests: 3,
+    hasBreakfast: true,
+    hasWifi: true
+  },
+  {
+    id: 5,
+    type: 'hotel',
+    name: "Grand Hyatt Rio",
+    location: "Rio de Janeiro, RJ",
+    image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=300&q=80",
+    price: 1540.00,
+    days: 3,
+    guests: 2,
+    hasBreakfast: true,
+    hasWifi: true
+  },
+  {
+    id: 6,
+    type: 'hotel',
+    name: "Nord Luxxor",
+    location: "João Pessoa, PB",
+    image: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=300&q=80",
+    price: 980.00,
+    days: 5,
+    guests: 2,
+    hasBreakfast: true,
+    hasWifi: true
+  },
+  {
+    id: 7,
+    type: 'hotel',
+    name: "Hotel Riu Plaza",
+    location: "Nova York, EUA",
+    image: "https://images.unsplash.com/photo-1496417263034-38ec4f0d665a?auto=format&fit=crop&w=300&q=80",
+    price: 5200.00,
+    days: 6,
+    guests: 2,
+    hasBreakfast: false,
+    hasWifi: true
+  }
+]);
+
+const passagensList = ref([
+  {
+    id: 101,
+    type: 'flight',
+    name: "São Paulo",
+    location: "Saindo de Brasília",
+    image: "https://images.unsplash.com/photo-1543059080-f9b1272213d5?auto=format&fit=crop&w=300&q=80",
+    price: 169.00,
+    oldPrice: 229.00,
+    discount: "23% OFF"
+  },
+  {
+    id: 102,
+    type: 'flight',
+    name: "Florianópolis",
+    location: "Saindo de São Paulo",
+    image: "https://images.unsplash.com/photo-1596484552834-6a58f850e0a1?auto=format&fit=crop&w=300&q=80",
+    price: 250.00,
+    oldPrice: 380.00,
+    discount: "34% OFF"
+  },
+  {
+    id: 103,
+    type: 'flight',
+    name: "Los Angeles",
+    location: "Saindo de SP",
+    image: "https://images.unsplash.com/photo-1534190239940-9ba8944ea261?auto=format&fit=crop&w=300&q=80",
+    price: 1118.00,
+    oldPrice: 1559.00,
+    discount: "28% OFF"
+  },
+  {
+    id: 104,
+    type: 'flight',
+    name: "Miami",
+    location: "Saindo do Rio",
+    image: "https://images.unsplash.com/photo-1535498730771-e735b998cd64?auto=format&fit=crop&w=300&q=80",
+    price: 950.00,
+    oldPrice: 1159.00,
+    discount: "18% OFF"
+  },
+  {
+    id: 105,
+    type: 'flight',
+    name: "Paris",
+    location: "Saindo de SP",
+    image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=300&q=80",
+    price: 2890.00,
+    oldPrice: 3500.00,
+    discount: "17% OFF"
+  },
+  {
+    id: 106,
+    type: 'flight',
+    name: "Lisboa",
+    location: "Saindo de Recife",
+    image: "https://images.unsplash.com/photo-1555881400-74d7acaacd81?auto=format&fit=crop&w=300&q=80",
+    price: 3100.00,
+    oldPrice: 4200.00,
+    discount: "26% OFF"
+  },
+  {
+    id: 107,
+    type: 'flight',
+    name: "Buenos Aires",
+    location: "Saindo de Porto Alegre",
+    image: "https://images.unsplash.com/photo-1589909202802-8f4aadce1849?auto=format&fit=crop&w=300&q=80",
+    price: 890.00,
+    oldPrice: 1200.00,
+    discount: "25% OFF"
+  }
+]);
+
+// Inputs refs (para os v-model funcionarem)
+const origin = ref('');
+const destination = ref('');
+const dateStart = ref('');
+const dateEnd = ref('');
+const rooms = ref('');
+const travellers = ref('');
+
+// Contato refs
+// Variáveis do formulário de contato
+const contactName = ref('');
+const contactEmail = ref('');
+const contactMessage = ref('');
+
+const sendMessage = () => {
+  alert(`Obrigado, ${contactName.value}! Sua mensagem foi enviada com sucesso.`);
+  // Limpar formulário
+  contactName.value = '';
+  contactEmail.value = '';
+  contactMessage.value = '';
+};
+</script>
+
+
+<style scoped>
+.hero {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background-image: url('https://www.postposmo.com/wp-content/uploads/2020/12/5-2.jpg');
+  background-size: cover;
+  background-position: center;
+
+  padding: 60px;
+  color: white;
+  overflow-x: hidden;
+
+
+  font-family: "Montserrat", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-style: normal;
+
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.35);
+
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 700px;
+}
+
+.hero-content img {
+  width: 50px;
+  margin-right: 20px;
+}
+
+.hero-content h1 {
+  font-size: 42px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.hero-content p {
+  font-size: 20px;
+  opacity: 0.9;
+}
+
+.confira-promocoes {
+  margin: 40px auto 0 auto;
+  max-width: 450px;
+  text-align: center;
+  /* centraliza tudo */
+}
+
+.confira-promocoes h3 {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 600;
+  font-size: 28px;
+  /* maior */
+  color: white;
+  /* texto branco */
+  margin-bottom: 10px;
+}
+
+.confira-promocoes .arrow img {
+  width: 45px;
+  /* tamanho agradável */
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  filter: brightness(100%);
+  /* garante ícone branco */
+  opacity: 0.9;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.confira-promocoes .arrow img:hover {
+  opacity: 1;
+  transform: translateY(5px);
+}
+
+/* card */
+.container-card {
+  overflow-x: hidden;
+}
+
+.travel-swiper {
+  margin-top: 40px;
+  width: 100%;
+  padding-bottom: 40px;
+}
+
+.travel-card {
+  height: 320px;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+}
+
+.card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 16px;
+  color: white;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+}
+
+.card-info h3 {
+  font-size: 20px;
+  margin: 0;
+}
+
+.card-info .date {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.card-info .price span {
+  font-weight: bold;
+  color: #00d1ff;
+}
+
+/* Setas */
+.swiper-button-next,
+.swiper-button-prev {
+  color: white !important;
+  font-weight: bold;
+  text-shadow: 0px 0px 10px black;
+}
+
+
+.find-section {
+  text-align: center;
+  padding: 50px 0;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 40px;
+}
+
+.inputs-container {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.input-box {
+  display: flex;
+  background: #f1f1f1;
+  border-radius: 40px;
+  overflow: hidden;
+}
+
+.input-item {
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  gap: 10px;
+}
+
+.input-item input {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 15px;
+}
+
+.divider {
+  width: 1px;
+  background: #ccc;
+}
+
+.search-btn {
+  margin-top: 40px;
+  padding: 14px 40px;
+  background: #009688;
+  color: white;
+  border: none;
+  border-radius: 40px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.search-btn:hover {
+  background: #00796b;
+}
+
+.icon {
+  font-size: 18px;
+}
+
+.promo-section {
+  padding: 40px 20px;
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+.header-section {
+  margin-bottom: 20px;
+}
+
+.header-section h2 {
+  font-size: 1.8rem;
+  margin-bottom: 5px;
+}
+
+/* Ajustes finos no Swiper se precisar */
+.travel-swiper {
+  padding-bottom: 40px;
+  /* Espaço para não cortar sombra do card */
+  padding-left: 10px;
+  /* Espaço lateral leve */
+  padding-right: 10px;
+}
+
+/* Personalizar a cor das setinhas do Swiper (opcional) */
+:deep(.swiper-button-next),
+:deep(.swiper-button-prev) {
+  color: #333;
+  /* Cor das setas */
+  background: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+:deep(.swiper-button-next:after),
+:deep(.swiper-button-prev:after) {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+/* resto */
+
+/* --- Estilos Gerais das Seções de Info --- */
+.info-section {
+  text-align: center;
+  padding: 40px 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+  color: #333;
+}
+
+.section-header h2 {
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.section-desc {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+.section-divider {
+  border: 0;
+  border-top: 1px solid #ddd;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* --- Parceiros --- */
+.partners-logos {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  margin-top: 30px;
+  flex-wrap: wrap;
+}
+
+.partners-logos img {
+  height: 50px;
+  /* Ajuste conforme seus logos */
+  object-fit: contain;
+  filter: grayscale(0%);
+  /* Pode usar grayscale(100%) se quiser cinza */
+  transition: 0.3s;
+}
+
+.partners-logos img:hover {
+  transform: scale(1.1);
+}
+
+/* --- Pagamento --- */
+.cta-text {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin: 20px 0;
+}
+
+.payment-warning {
+  color: #d32f2f;
+  /* Vermelho da imagem */
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.info-icon {
+  background: #eee;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+}
+
+.payment-logos {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.payment-logos img {
+  height: 35px;
+}
+
+.boleto-icon {
+  border: 1px solid #ccc;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+/* --- Contato / Rodapé --- */
+.contact-section {
+  background-color: #f9f9f9;
+  padding: 50px 20px;
+  margin-top: 50px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 50px;
+  align-items: flex-start;
+}
+
+.contact-text {
+  max-width: 400px;
+  text-align: left;
+}
+
+.contact-text h3 {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+}
+
+.contact-text p {
+  color: #666;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+.small-text {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #333 !important;
+}
+
+.contact-form {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+  width: 100%;
+  max-width: 400px;
+}
+
+.contact-form h4 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: 0.3s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: #009688;
+  outline: none;
+}
+
+.btn-send {
+  width: 100%;
+  padding: 12px;
+  background-color: #009688;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-send:hover {
+  background-color: #00796b;
+}
+
+/* Responsivo para mobile */
+@media (max-width: 768px) {
+  .contact-section {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .contact-text {
+    text-align: center;
+    margin: 0 auto;
+  }
+}
+</style>

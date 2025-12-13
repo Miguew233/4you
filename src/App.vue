@@ -1,16 +1,18 @@
 <script setup>
-  import HeroSection from '@/pages/Home/index.vue';
-  import Header from '@/components/Header/Header.vue';
+// O Header pode ficar aqui se você quiser que ele apareça em TODAS as páginas
+import Header from '@/components/Header/Header.vue';
+
+// REMOVIDO: import HomePage from '@/pages/Home/Home.vue';
+// (Não importamos páginas fixas no App.vue quando usamos rotas)
 </script>
 
 <template>
-   <Header />
-  <HeroSection />
-  <p>
-    
-    Visit <a href="https://vuejs.org/" target="_blank" rel="noopener">vuejs.org</a> to read the
-    bolsonaro
-  </p>
+  <Header />
+
+  <RouterView />
+
 </template>
 
-<style scoped></style>
+<style scoped>
+/* Seus estilos globais */
+</style>
