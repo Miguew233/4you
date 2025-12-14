@@ -24,13 +24,19 @@
         </li>
 
         <li class="nav-item">
+          <router-link to="/sobre" class="nav-link">
+             Sobre Nós
+          </router-link>
+        </li>
+
+        <li class="nav-item">
           <a href="/login" class="nav-link">
             <img src="../../icons/Login.png" class="icon" /> Login
           </a>
         </li>
 
         <li class="nav-item">
-          <a href="/registrar" class="btn-registrar">Registrar</a>
+          <a href="/register" class="btn-registrar">Registrar</a>
         </li>
       </ul>
 
