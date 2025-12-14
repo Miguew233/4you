@@ -11,6 +11,18 @@ import Sobre from '@/pages/Sobre/Sobre.vue';
 import Pacotes from '../pages/Pacotes/Pacotes.vue';
 import DetalhesPacote from '../pages/Details/DetailsPacote.vue';
 
+// Imports do Admin
+import AdminLayout from '../pages/Admin/AdminLayout.vue'
+import Dashboard from '@/pages/Admin/Dashboard.vue'
+import ManageHotels from '@/pages/Admin/ManageHotels.vue'
+import ManageFlights from '@/pages/Admin/ManageFlights.vue'
+import ManagePackages from '@/pages/Admin/ManagePackages.vue'
+
+
+// Impoets do User
+import UserLayout from '@/pages/User/UserLayout.vue';
+import MyBookings from '@/pages/User/MyBookings.vue';
+import UserProfile from '@/pages/User/UserProfile.vue';
 const routes = [
   { path: '/', name: 'Home', component: Home },
 
@@ -25,7 +37,46 @@ const routes = [
   { path: '/hoteis/:id', name: 'DetalhesHotel', component: Details },
   { path: '/voos/:id', name: 'DetalhesPassagem', component: Details },
   { path: '/pacotes', name: 'Pacotes', component: Pacotes },
-  { path: '/pacotes/:id', name: 'DetalhesPacote', component: DetalhesPacote }
+  { path: '/pacotes/:id', name: 'DetalhesPacote', component: DetalhesPacote },
+
+  // --- ROTAS DO ADMIN (Novo!) ---
+  {
+    path: '/admin',
+    component: AdminLayout, // O pai carrega o Layout (Sidebar)
+    children: [
+      {
+        path: '', // Quando for apenas /admin
+        name: 'AdminDashboard',
+        component: Dashboard
+      },
+      {
+        path: 'hoteis',
+        name: 'AdminHoteis',
+        // Vamos criar esse arquivo no próximo passo,
+        // mas já deixo o placeholder para não quebrar o link
+        component: ManageHotels
+      },
+      {
+        path: 'voos',
+        name: 'AdminVoos',
+        component: ManageFlights
+      },
+      {
+        path: 'pacotes',
+        name: 'AdminPacotes',
+        component: ManagePackages
+      }
+    ]
+  },
+  // ROTA DO USUÁRIO
+  {
+    path: '/usuario',
+    component: UserLayout,
+    children: [
+      { path: '', component: UserProfile }, // /usuario (Perfil)
+      { path: 'viagens', component: MyBookings } // /usuario/viagens
+    ]
+  }
 ]
 
 const router = createRouter({

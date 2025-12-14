@@ -39,7 +39,7 @@ export default {
 
 <style scoped>
 footer {
-  background: linear-gradient(135deg, #333 0%, #222 100%);
+  background-color: #222;
   color: white;
   padding: 50px 20px 20px;
   margin-top: 60px;
@@ -144,9 +144,11 @@ footer a:hover {
     flex-direction: column;
     text-align: center;
   }
+
   .footer-section {
     margin: 15px 0;
   }
+
   .social-links {
     justify-content: center;
   }

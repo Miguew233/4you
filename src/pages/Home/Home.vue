@@ -201,209 +201,42 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 
 // 1. Imports do Swiper
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import { Navigation } from 'swiper/modules';
-
-// 2. Imports de CSS do Swiper
 import 'swiper/css';
 import 'swiper/css/navigation';
 
-// 3. Import do seu Componente
+// 2. Import do Componente de Card
 import TravelCard from "@/components/Cards/TravelCard.vue";
 
-// 4. Configuração dos Módulos (Isso resolve o erro de constructor)
+// 3. IMPORTAR A STORE DO PINIA
+import { useTravelStore } from '@/stores/travelStore';
+
+// Configuração dos Módulos do Swiper
 const modules = [Navigation];
 
-// 5. Seus dados (substituindo o data() antigo)
+// Inicializar a Store
+const store = useTravelStore();
+
+// --- DADOS ---
+
+// Card Estático da Hero (Maceió, Fortaleza...)
+// (Esse mantemos local pois é específico só do banner da Home)
 const travelCards = ref([
-  {
-    city: "Maceió",
-    date: "28 de ago - 31 de ago",
-    price: "1.629",
-    image: "https://i.imgur.com/r4ZQ0K4.jpeg"
-  },
-  {
-    city: "Fortaleza",
-    date: "17 de jun - 21 de jun",
-    price: "1.927",
-    image: "https://i.imgur.com/Ynk1xhK.jpeg"
-  },
-  {
-    city: "Rio de Janeiro",
-    date: "06 de ago - 09 de ago",
-    price: "535",
-    image: "https://i.imgur.com/Y2s2ypU.jpeg"
-  },
-  {
-    city: "Oslo",
-    date: "03 de jun - 09 de jun",
-    price: "4.243",
-    image: "https://i.imgur.com/aA3xzqg.jpeg"
-  }
+  { city: "Maceió", date: "28 de ago - 31 de ago", price: "1.629", image: "https://i.imgur.com/r4ZQ0K4.jpeg" },
+  { city: "Fortaleza", date: "17 de jun - 21 de jun", price: "1.927", image: "https://i.imgur.com/Ynk1xhK.jpeg" },
+  { city: "Rio de Janeiro", date: "06 de ago - 09 de ago", price: "535", image: "https://i.imgur.com/Y2s2ypU.jpeg" },
+  { city: "Oslo", date: "03 de jun - 09 de jun", price: "4.243", image: "https://i.imgur.com/aA3xzqg.jpeg" }
 ]);
 
-const hoteisList = ref([
-  {
-    id: 1,
-    type: 'hotel',
-    name: "Hotel Golden Vilage",
-    location: "São Paulo, SP",
-    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=300&q=80",
-    price: 616.00,
-    days: 4,
-    guests: 2,
-    hasBreakfast: true,
-    hasWifi: true
-  },
-  {
-    id: 2,
-    type: 'hotel',
-    name: "Majestic Palace Hotel",
-    location: "Florianópolis, SC",
-    image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=300&q=80",
-    price: 2185.00,
-    days: 7,
-    guests: 2,
-    hasBreakfast: true,
-    hasWifi: true
-  },
-  {
-    id: 3,
-    type: 'hotel',
-    name: "Crowne Plaza LA",
-    location: "Los Angeles, EUA",
-    image: "https://images.unsplash.com/photo-1564501049412-61c2a3083791?auto=format&fit=crop&w=300&q=80",
-    price: 4152.00,
-    days: 7,
-    guests: 2,
-    hasBreakfast: false,
-    hasWifi: true
-  },
-  {
-    id: 4,
-    type: 'hotel',
-    name: "EVEN Hotel Miami",
-    location: "Miami, EUA",
-    image: "https://images.unsplash.com/photo-1571896349842-6e53ce41e8f2?auto=format&fit=crop&w=300&q=80",
-    price: 2873.00,
-    days: 5,
-    guests: 3,
-    hasBreakfast: true,
-    hasWifi: true
-  },
-  {
-    id: 5,
-    type: 'hotel',
-    name: "Grand Hyatt Rio",
-    location: "Rio de Janeiro, RJ",
-    image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=300&q=80",
-    price: 1540.00,
-    days: 3,
-    guests: 2,
-    hasBreakfast: true,
-    hasWifi: true
-  },
-  {
-    id: 6,
-    type: 'hotel',
-    name: "Nord Luxxor",
-    location: "João Pessoa, PB",
-    image: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=300&q=80",
-    price: 980.00,
-    days: 5,
-    guests: 2,
-    hasBreakfast: true,
-    hasWifi: true
-  },
-  {
-    id: 7,
-    type: 'hotel',
-    name: "Hotel Riu Plaza",
-    location: "Nova York, EUA",
-    image: "https://images.unsplash.com/photo-1496417263034-38ec4f0d665a?auto=format&fit=crop&w=300&q=80",
-    price: 5200.00,
-    days: 6,
-    guests: 2,
-    hasBreakfast: false,
-    hasWifi: true
-  }
-]);
-
-const passagensList = ref([
-  {
-    id: 101,
-    type: 'flight',
-    name: "São Paulo",
-    location: "Saindo de Brasília",
-    image: "https://images.unsplash.com/photo-1543059080-f9b1272213d5?auto=format&fit=crop&w=300&q=80",
-    price: 169.00,
-    oldPrice: 229.00,
-    discount: "23% OFF"
-  },
-  {
-    id: 102,
-    type: 'flight',
-    name: "Florianópolis",
-    location: "Saindo de São Paulo",
-    image: "https://images.unsplash.com/photo-1596484552834-6a58f850e0a1?auto=format&fit=crop&w=300&q=80",
-    price: 250.00,
-    oldPrice: 380.00,
-    discount: "34% OFF"
-  },
-  {
-    id: 103,
-    type: 'flight',
-    name: "Los Angeles",
-    location: "Saindo de SP",
-    image: "https://images.unsplash.com/photo-1534190239940-9ba8944ea261?auto=format&fit=crop&w=300&q=80",
-    price: 1118.00,
-    oldPrice: 1559.00,
-    discount: "28% OFF"
-  },
-  {
-    id: 104,
-    type: 'flight',
-    name: "Miami",
-    location: "Saindo do Rio",
-    image: "https://images.unsplash.com/photo-1535498730771-e735b998cd64?auto=format&fit=crop&w=300&q=80",
-    price: 950.00,
-    oldPrice: 1159.00,
-    discount: "18% OFF"
-  },
-  {
-    id: 105,
-    type: 'flight',
-    name: "Paris",
-    location: "Saindo de SP",
-    image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=300&q=80",
-    price: 2890.00,
-    oldPrice: 3500.00,
-    discount: "17% OFF"
-  },
-  {
-    id: 106,
-    type: 'flight',
-    name: "Lisboa",
-    location: "Saindo de Recife",
-    image: "https://images.unsplash.com/photo-1555881400-74d7acaacd81?auto=format&fit=crop&w=300&q=80",
-    price: 3100.00,
-    oldPrice: 4200.00,
-    discount: "26% OFF"
-  },
-  {
-    id: 107,
-    type: 'flight',
-    name: "Buenos Aires",
-    location: "Saindo de Porto Alegre",
-    image: "https://images.unsplash.com/photo-1589909202802-8f4aadce1849?auto=format&fit=crop&w=300&q=80",
-    price: 890.00,
-    oldPrice: 1200.00,
-    discount: "25% OFF"
-  }
-]);
+// --- DADOS DINÂMICOS VINDOS DA STORE ---
+// Aqui está a mudança: Não digitamos mais a lista gigante.
+// A Home apenas "observa" a store.
+const hoteisList = computed(() => store.hoteis);
+const passagensList = computed(() => store.passagens);
 
 // Inputs refs (para os v-model funcionarem)
 const origin = ref('');
@@ -413,7 +246,6 @@ const dateEnd = ref('');
 const rooms = ref('');
 const travellers = ref('');
 
-// Contato refs
 // Variáveis do formulário de contato
 const contactName = ref('');
 const contactEmail = ref('');
@@ -421,7 +253,6 @@ const contactMessage = ref('');
 
 const sendMessage = () => {
   alert(`Obrigado, ${contactName.value}! Sua mensagem foi enviada com sucesso.`);
-  // Limpar formulário
   contactName.value = '';
   contactEmail.value = '';
   contactMessage.value = '';

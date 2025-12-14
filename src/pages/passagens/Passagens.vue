@@ -36,32 +36,35 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { computed } from 'vue';
 import TravelCard from '@/components/Cards/TravelCard.vue';
+import { useTravelStore } from '@/stores/travelStore';
 
-const ofertasList = ref([
-  { id: 101, type: 'flight', name: "São Paulo", location: "Saindo de Brasília", image: "https://images.unsplash.com/photo-1543059080-f9b1272213d5?auto=format&fit=crop&w=300&q=80", price: 169.00, oldPrice: 229.00, discount: "23% OFF" },
-  { id: 102, type: 'flight', name: "Florianópolis", location: "Saindo de SP", image: "https://images.unsplash.com/photo-1596484552834-6a58f850e0a1?auto=format&fit=crop&w=300&q=80", price: 250.00, oldPrice: 380.00, discount: "34% OFF" },
-  { id: 103, type: 'flight', name: "Los Angeles", location: "Saindo de SP", image: "https://images.unsplash.com/photo-1534190239940-9ba8944ea261?auto=format&fit=crop&w=300&q=80", price: 1118.00, oldPrice: 1559.00, discount: "28% OFF" },
-]);
+// 1. Acessar a Store
+const store = useTravelStore();
 
-const nacionaisList = ref([
-  { id: 104, type: 'flight', name: "Rio de Janeiro", location: "Saindo de BH", image: "https://images.unsplash.com/photo-1483729558449-99ef09a8c325?auto=format&fit=crop&w=300&q=80", price: 220.00, oldPrice: 300.00 },
-  { id: 105, type: 'flight', name: "Salvador", location: "Saindo de SP", image: "https://images.unsplash.com/photo-1512753360377-5435e1657c7c?auto=format&fit=crop&w=300&q=80", price: 450.00, oldPrice: 600.00 },
-  { id: 101, type: 'flight', name: "São Paulo", location: "Saindo de Brasília", image: "https://images.unsplash.com/photo-1543059080-f9b1272213d5?auto=format&fit=crop&w=300&q=80", price: 169.00, oldPrice: 229.00 },
-  { id: 102, type: 'flight', name: "Florianópolis", location: "Saindo de SP", image: "https://images.unsplash.com/photo-1596484552834-6a58f850e0a1?auto=format&fit=crop&w=300&q=80", price: 250.00, oldPrice: 380.00 },
-]);
+// 2. Criar Listas Inteligentes (Computed)
 
-const internacionaisList = ref([
-  { id: 106, type: 'flight', name: "Lisboa", location: "Saindo de Recife", image: "https://images.unsplash.com/photo-1555881400-74d7acaacd81?auto=format&fit=crop&w=300&q=80", price: 3100.00, oldPrice: 4200.00 },
-  { id: 107, type: 'flight', name: "Buenos Aires", location: "Saindo de POA", image: "https://images.unsplash.com/photo-1589909202802-8f4aadce1849?auto=format&fit=crop&w=300&q=80", price: 890.00, oldPrice: 1200.00 },
-  { id: 105, type: 'flight', name: "Paris", location: "Saindo de SP", image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=300&q=80", price: 2890.00, oldPrice: 3500.00 },
-  { id: 103, type: 'flight', name: "Los Angeles", location: "Saindo de SP", image: "https://images.unsplash.com/photo-1534190239940-9ba8944ea261?auto=format&fit=crop&w=300&q=80", price: 1118.00, oldPrice: 1559.00 },
-]);
+// OFERTAS: Pega apenas os itens que têm a propriedade 'discount'
+const ofertasList = computed(() => {
+  return store.passagens.filter(p => p.discount);
+});
+
+// NACIONAIS: Como ainda não temos "countryCode", vou filtrar pelos nomes das cidades BR que temos na lista
+const nacionaisList = computed(() => {
+  const cidadesBR = ['São Paulo', 'Florianópolis', 'Rio de Janeiro', 'Salvador', 'Maceió', 'Fortaleza'];
+  return store.passagens.filter(p => cidadesBR.some(cidade => p.name.includes(cidade)));
+});
+
+// INTERNACIONAIS: Tudo que NÃO for das cidades BR acima
+const internacionaisList = computed(() => {
+  const cidadesBR = ['São Paulo', 'Florianópolis', 'Rio de Janeiro', 'Salvador', 'Maceió', 'Fortaleza'];
+  return store.passagens.filter(p => !cidadesBR.some(cidade => p.name.includes(cidade)));
+});
+
 </script>
 
 <style scoped>
-/* Pode reutilizar o mesmo CSS da página de Hotéis */
 .listing-page {
   font-family: 'Montserrat', sans-serif;
   background-color: #f9f9f9;
@@ -122,9 +125,7 @@ const internacionaisList = ref([
   justify-items: center;
 }
 
-/* Isso aqui é mágico. Ele cria colunas automáticas.
-   Se a tela for pequena, cria 1 coluna. Se for grande, cria várias.
-   O 'minmax(280px, 1fr)' diz: "O card deve ter no mínimo 280px" */
+/* Responsividade do Grid */
 .cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -141,7 +142,6 @@ const internacionaisList = ref([
 
   .header-content h1 {
     font-size: 1.5rem;
-    /* Fonte menor no celular */
     justify-content: center;
   }
 }
