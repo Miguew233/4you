@@ -1,26 +1,25 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../pages/Home/Home.vue'
-// Importe a página nova
 import Details from '../pages/Details/Details.vue'
+// Importe as novas páginas
+import Hoteis from '../pages/Hoteis/Hoteis.vue'
+import Passagens from '../pages/passagens/Passagens.vue'
+// ... imports anteriores
+import Pacotes from '../pages/Pacotes/Pacotes.vue';
+import DetalhesPacote from '../pages/Details/DetailsPacote.vue';
 
 const routes = [
-  {
-    path: '/',
-    name: 'Home',
-    component: Home
-  },
-  // Rota para Hoteis (espera um ID)
-  {
-    path: '/hoteis/:id',
-    name: 'DetalhesHotel',
-    component: Details
-  },
-  // Rota para Voos (espera um ID)
-  {
-    path: '/voos/:id',
-    name: 'DetalhesPassagem',
-    component: Details
-  }
+  { path: '/', name: 'Home', component: Home },
+
+  // Rotas de Listagem (Novas)
+  { path: '/hoteis', name: 'ListagemHoteis', component: Hoteis },
+  { path: '/passagens', name: 'ListagemPassagens', component: Passagens },
+
+  // Rotas de Detalhes
+  { path: '/hoteis/:id', name: 'DetalhesHotel', component: Details },
+  { path: '/voos/:id', name: 'DetalhesPassagem', component: Details },
+  { path: '/pacotes', name: 'Pacotes', component: Pacotes },
+  { path: '/pacotes/:id', name: 'DetalhesPacote', component: DetalhesPacote }
 ]
 
 const router = createRouter({

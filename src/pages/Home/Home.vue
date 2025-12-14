@@ -43,12 +43,12 @@
         <label>Selecione :</label>
         <div class="input-box">
           <div class="input-item">
-            <span class="icon">📍</span>
+            <span class="icon"><img src="/src/icons/local.png" alt=""></span>
             <input type="text" placeholder="Origem" v-model="origin">
           </div>
           <div class="divider"></div>
           <div class="input-item">
-            <span class="icon">📍</span>
+            <span class="icon"><img src="/src/icons/local.png" alt=""></span>
             <input type="text" placeholder="Destino" v-model="destination">
           </div>
         </div>
@@ -59,12 +59,12 @@
         <label>Selecione :</label>
         <div class="input-box">
           <div class="input-item">
-            <span class="icon">📅</span>
+            <span class="icon"><img src="/src/icons/Calendario.png" alt=""></span>
             <input type="date" v-model="dateStart">
           </div>
           <div class="divider"></div>
           <div class="input-item">
-            <span class="icon">📅</span>
+            <span class="icon"><img src="/src/icons/Calendario.png" alt=""></span>
             <input type="date" v-model="dateEnd">
           </div>
         </div>
@@ -75,12 +75,12 @@
         <label>Selecione :</label>
         <div class="input-box">
           <div class="input-item">
-            <span class="icon">🚗</span>
+            <span class="icon"><img src="/src/icons/Quarto.png" alt=""></span>
             <input type="number" min="1" placeholder="Quartos" v-model="rooms">
           </div>
           <div class="divider"></div>
           <div class="input-item">
-            <span class="icon">👥</span>
+            <span class="icon"><img src="/src/icons/Viajantes.png" alt=""></span>
             <input type="number" min="1" placeholder="Viajantes" v-model="travellers">
           </div>
         </div>
@@ -430,24 +430,31 @@ const sendMessage = () => {
 
 
 <style scoped>
+/* --- HERO SECTION --- */
 .hero {
   position: relative;
   width: 100%;
-  height: 100vh;
+  min-height: 100vh;
+  /* Alterado de height fixo para min-height para evitar cortes */
   background-image: url('https://www.postposmo.com/wp-content/uploads/2020/12/5-2.jpg');
   background-size: cover;
   background-position: center;
 
-  padding: 60px;
+  /* A MÁGICA DO ALINHAMENTO GERAL */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* Centraliza verticalmente o bloco todo */
+
+  /* Ajuste do Padding:
+     120px em cima (para limpar o Header transparente)
+     60px nas laterais
+     40px embaixo */
+  padding: 120px 60px 40px 60px;
+
   color: white;
   overflow-x: hidden;
-
-
   font-family: "Montserrat", sans-serif;
-  font-optical-sizing: auto;
-  font-weight: 500;
-  font-style: normal;
-
 }
 
 .overlay {
@@ -456,37 +463,80 @@ const sendMessage = () => {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.35);
-
+  background: rgba(0, 0, 0, 0.4);
+  /* Escureci levemente para 0.4 para ler melhor */
+  z-index: 1;
+  /* Garante que fique atrás do conteúdo */
 }
 
+/* --- CONTEÚDO DE TEXTO --- */
 .hero-content {
   position: relative;
   z-index: 2;
-  max-width: 700px;
+  max-width: 800px;
+  /* Aumentei um pouco para respirar */
+  margin-bottom: 30px;
+  /* Empurra o carrossel para baixo */
+}
+
+/* O Segredo da Maleta Alinhada */
+.hero-content h1 {
+  font-size: 48px;
+  /* Levemente maior */
+  font-weight: 800;
+  margin-bottom: 15px;
+
+  /* Flexbox para alinhar ícone e texto */
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  /* Espaço entre a maleta e o texto */
+}
+
+/* O span que envolve a imagem não precisa atrapalhar */
+.hero-content h1 span {
+  display: flex;
+  align-items: center;
 }
 
 .hero-content img {
-  width: 50px;
-  margin-right: 20px;
-}
-
-.hero-content h1 {
-  font-size: 42px;
-  font-weight: bold;
-  margin-bottom: 10px;
+  width: 45px;
+  height: auto;
+  margin-right: 0;
+  /* Removemos a margem antiga pois usamos 'gap' no h1 */
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  /* Sombra para destacar do fundo */
 }
 
 .hero-content p {
   font-size: 20px;
-  opacity: 0.9;
+  opacity: 0.95;
+  font-weight: 400;
+  max-width: 600px;
+  /* Limita a largura do parágrafo para não esticar demais */
+  line-height: 1.5;
 }
 
+/* --- CARROSSEL --- */
+.container-card {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+}
+
+.travel-swiper {
+  padding-bottom: 10px;
+  /* Remove excesso de espaço */
+}
+
+/* --- CHAMADA FINAL (Seta) --- */
 .confira-promocoes {
-  margin: 40px auto 0 auto;
+  position: relative;
+  z-index: 2;
+  margin: 30px auto 0 auto;
+  /* Ajuste do espaçamento superior */
   max-width: 450px;
   text-align: center;
-  /* centraliza tudo */
 }
 
 .confira-promocoes h3 {
@@ -567,6 +617,99 @@ const sendMessage = () => {
   color: #00d1ff;
 }
 
+/* --- RESPONSIVIDADE (MOBILE & TABLET) --- */
+
+@media (max-width: 768px) {
+  .hero {
+    /* Muda de altura fixa para altura mínima */
+    height: auto;
+    min-height: 100vh;
+
+    /* Reduz o padding lateral drásticamente */
+    padding: 100px 20px 40px 20px;
+
+    /* Centraliza o conteúdo verticalmente */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .hero-content {
+    /* Garante que o texto ocupe a largura disponível */
+    max-width: 100%;
+    text-align: center;
+    /* Centraliza texto no mobile */
+  }
+
+  .hero-content h1 {
+    font-size: 28px;
+    /* Reduz de 42px para 28px */
+    display: flex;
+    flex-direction: column;
+    /* Coloca ícone em cima do texto se precisar */
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hero-content img {
+    width: 40px;
+    /* Reduz ícone levemente */
+    margin-right: 0;
+    margin-bottom: 10px;
+    /* Espaço abaixo do ícone */
+  }
+
+  .hero-content p {
+    font-size: 16px;
+    /* Reduz de 20px para 16px */
+    margin-top: 10px;
+  }
+
+  /* Ajustes no Swiper/Card */
+  .travel-swiper {
+    margin-top: 30px;
+    padding-bottom: 30px;
+    /* Menos espaço sobrando embaixo */
+  }
+
+  .travel-card {
+    height: 280px;
+    /* Card um pouco menor no mobile */
+  }
+
+  .card-info h3 {
+    font-size: 18px;
+  }
+
+  /* Ajustes na chamada final (seta) */
+  .confira-promocoes {
+    margin-top: 20px;
+  }
+
+  .confira-promocoes h3 {
+    font-size: 20px;
+    /* Reduz de 28px */
+  }
+
+  .confira-promocoes .arrow img {
+    width: 35px;
+  }
+}
+
+/* Ajuste extra para telas MUITO pequenas (iPhone SE, etc) */
+@media (max-width: 380px) {
+  .hero-content h1 {
+    font-size: 24px;
+  }
+
+  .travel-card {
+    height: 250px;
+  }
+}
+
+/* hero acaba aqui */
+
+
 /* Setas */
 .swiper-button-next,
 .swiper-button-prev {
@@ -611,6 +754,8 @@ const sendMessage = () => {
   align-items: center;
   padding: 15px 20px;
   gap: 10px;
+
+  flex: 1;
 }
 
 .input-item input {
@@ -618,6 +763,10 @@ const sendMessage = () => {
   outline: none;
   background: transparent;
   font-size: 15px;
+  width: 100%;
+  /* O input deve esticar */
+  min-width: 0;
+  /* Previne overflow em flexbox */
 }
 
 .divider {
@@ -645,6 +794,64 @@ const sendMessage = () => {
   font-size: 18px;
 }
 
+@media (max-width: 1024px) {
+
+  /* Em tablets e celulares, mudamos para coluna */
+  .inputs-container {
+    flex-direction: column;
+    align-items: center;
+    /* Centraliza os blocos */
+    gap: 25px;
+  }
+
+  .input-group {
+    width: 100%;
+    max-width: 500px;
+    /* Largura máxima para não ficar gigante no tablet */
+  }
+
+  /* Ajuste no label para alinhar a esquerda do input */
+  .input-group label {
+    text-align: left;
+    margin-left: 15px;
+    margin-bottom: 5px;
+  }
+
+  .input-box {
+    width: 100%;
+    /* O box cinza ocupa toda a largura permitida */
+  }
+}
+
+/* Ajuste para celulares muito pequenos (iPhone SE, Galaxy Fold) */
+@media (max-width: 480px) {
+  .find-section {
+    padding: 30px 15px;
+  }
+
+  .title {
+    font-size: 24px;
+    margin-bottom: 30px;
+  }
+
+  .input-item {
+    padding: 12px 10px;
+    /* Reduz padding interno para caber texto */
+  }
+
+  .input-item input {
+    font-size: 13px;
+    /* Fonte um pouco menor */
+  }
+
+  .search-btn {
+    width: 100%;
+    /* Botão largura total no mobile fica melhor */
+    max-width: 500px;
+  }
+}
+
+/* aqui acaba o filtro */
 .promo-section {
   padding: 40px 20px;
   max-width: 1300px;
