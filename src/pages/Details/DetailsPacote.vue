@@ -1,167 +1,131 @@
 <template>
-  <div class="package-details" v-if="pacote">
+  <div class="details-page">
 
-    <div class="hero-header" :style="{ backgroundImage: `url(${pacote.image})` }">
-      <div class="overlay"></div>
-      <div class="hero-content">
-        <button class="btn-back" @click="$router.push('/pacotes')">⬅ Voltar</button>
-        <span class="badge">📦 Pacote Promocional</span>
-        <h1>{{ pacote.title }}</h1>
+    <div v-if="pacote" class="content-wrapper">
+
+      <div class="hero-image" :style="{ backgroundImage: `url(${pacote.image})` }">
+        <div class="overlay"></div>
+        <div class="hero-content">
+          <button class="btn-back" @click="$router.push('/pacotes')">⬅ Voltar</button>
+          <h1>{{ pacote.title }}</h1>
+          <p class="subtitle">{{ pacote.days }} dias | {{ pacote.persons }} pessoas</p>
+        </div>
       </div>
-    </div>
 
-    <div class="container">
-      <div class="content-grid">
+      <div class="container">
 
-        <div class="info-column">
+        <div class="combo-details">
 
-          <div class="info-card">
-            <div class="card-header">
-              <h3>✈️ Informações do Voo</h3>
-            </div>
-            <div class="flight-route">
-              <div class="point">
-                <strong>{{ pacote.flight.origin }}</strong>
-                <span class="time">08:00</span>
-              </div>
-              <div class="line">
-                <span class="duration">Duração: 3h</span>
-                <span class="arrow">➝</span>
-              </div>
-              <div class="point">
-                <strong>{{ pacote.flight.destination }}</strong>
-                <span class="time">11:00</span>
-              </div>
-            </div>
-            <p class="obs">Inclui bagagem de mão (10kg)</p>
+          <div class="detail-card">
+            <div class="icon-header">✈️ Voo Incluso</div>
+            <h3>{{ pacote.flight?.name || 'Voo' }}</h3>
+            <p>{{ pacote.flight?.location }}</p>
+            <p class="obs">Passagem de Ida e Volta inclusa</p>
           </div>
 
-          <div class="info-card">
-            <div class="card-header">
-              <h3>🏨 Hospedagem Inclusa</h3>
-            </div>
-            <div class="hotel-details">
-              <h4>{{ pacote.hotel.name }}</h4>
-              <p>📍 {{ pacote.hotel.location }}</p>
-              <div class="stars">⭐⭐⭐⭐⭐ ({{ pacote.hotel.stars }} Estrelas)</div>
-              <ul class="amenities-list">
-                <li>☕ Café da manhã</li>
-                <li>📶 Wi-Fi Grátis</li>
-                <li>❄️ Ar condicionado</li>
-              </ul>
+          <div class="plus-sign">+</div>
+
+          <div class="detail-card">
+            <div class="icon-header">🏨 Hotel Incluso</div>
+            <h3>{{ pacote.hotel?.name || 'Hotel' }}</h3>
+            <p>{{ pacote.hotel?.location }}</p>
+            <div class="tags">
+              <span v-if="pacote.hotel?.hasBreakfast">☕ Café da Manhã</span>
+              <span v-if="pacote.hotel?.hasWifi">📶 Wi-Fi</span>
             </div>
           </div>
 
         </div>
 
-        <div class="sidebar">
-          <div class="checkout-card">
-            <span class="label">Preço final do pacote</span>
-            <div class="price">
-              <small>R$</small> {{ pacote.price.toLocaleString('pt-BR') }}
-            </div>
-            <div class="details-list">
-              <div class="row"><span>Pessoas</span> <strong>{{ pacote.persons }}</strong></div>
-              <div class="row"><span>Dias</span> <strong>{{ pacote.days }}</strong></div>
-            </div>
-            <button class="btn-buy">Comprar Pacote</button>
-            <p class="secure">🔒 Compra Segura</p>
+        <div class="booking-section">
+          <div class="price-box">
+            <span class="label">Preço Total do Pacote</span>
+            <span class="price">R$ {{ pacote.price.toLocaleString('pt-BR') }}</span>
+            <span class="installments">em até 12x sem juros</span>
           </div>
+
+          <button class="btn-buy" @click="handleBuy">
+            Comprar Pacote Agora
+          </button>
         </div>
 
       </div>
+
     </div>
+
+    <div v-else class="not-found">
+      <h2>Pacote não encontrado 😢</h2>
+      <button @click="$router.push('/pacotes')">Voltar para a lista</button>
+    </div>
+
   </div>
 </template>
 
 <script setup>
 import { computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
+import { useTravelStore } from '@/stores/travelStore';
 
 const route = useRoute();
-const id = Number(route.params.id);
+const router = useRouter();
+const store = useTravelStore();
 
-// Simulação de busca no banco de dados
-const pacotesList = [
-  {
-    id: 900,
-    title: "Feriadão em Salvador",
-    price: 2450.00,
-    image: "https://images.unsplash.com/photo-1512753360377-5435e1657c7c?auto=format&fit=crop&w=800&q=80",
-    days: 5,
-    persons: 2,
-    hotel: { name: "Resort Bahia", stars: 5, location: "Salvador, BA" },
-    flight: { origin: "São Paulo (GRU)", destination: "Salvador (SSA)" }
-  },
-  {
-    id: 901,
-    title: "Eurotrip Paris Romântica",
-    price: 6890.00,
-    image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=800&q=80",
-    days: 7,
-    persons: 2,
-    hotel: { name: "Paris Luxury", stars: 4, location: "Paris, França" },
-    flight: { origin: "Rio de Janeiro (GIG)", destination: "Paris (CDG)" }
-  },
-  {
-    id: 902,
-    title: "Miami Beach Experience",
-    price: 4200.00,
-    image: "https://images.unsplash.com/photo-1535498730771-e735b998cd64?auto=format&fit=crop&w=800&q=80",
-    days: 6,
-    persons: 2,
-    hotel: { name: "EVEN Hotel Miami", stars: 4, location: "Miami, EUA" },
-    flight: { origin: "São Paulo (GRU)", destination: "Miami (MIA)" }
+// 1. Pega o ID da URL e converte para Número (Importante!)
+const pacoteId = Number(route.params.id);
+
+// 2. Busca na lista de "Pacotes Completos" (que já tem o hotel e voo dentro)
+const pacote = computed(() => {
+  return store.pacotesCompletos.find(p => p.id === pacoteId);
+});
+
+// 3. Função de Compra
+const handleBuy = () => {
+  if (confirm(`Confirmar compra do pacote "${pacote.value.title}"?`)) {
+    store.confirmBooking(pacote.value, 'pacote');
+    router.push('/usuario/viagens');
   }
-];
-
-const pacote = computed(() => pacotesList.find(p => p.id === id));
+};
 </script>
 
 <style scoped>
-.package-details {
-  font-family: 'Montserrat', sans-serif;
-  background: #f4f4f4;
+.details-page {
+  background: #f8f9fa;
   min-height: 100vh;
+  padding-bottom: 50px;
+  font-family: 'Montserrat', sans-serif;
 }
 
-.hero-header {
-  height: 350px;
+.hero-image {
+  height: 400px;
   background-size: cover;
   background-position: center;
   position: relative;
   display: flex;
   align-items: flex-end;
-  color: white;
 }
 
 .overlay {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
 }
 
 .hero-content {
   position: relative;
   z-index: 2;
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 40px 20px;
-  width: 100%;
-}
-
-.badge {
-  background: #ff9800;
-  padding: 5px 10px;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  font-weight: bold;
-  text-transform: uppercase;
+  padding: 90px 60px;
+  color: white;
 }
 
 .hero-content h1 {
-  font-size: 2.5rem;
-  margin: 10px 0 0 0;
+  font-size: 3rem;
+  margin: 10px 0;
 }
 
 .btn-back {
@@ -171,170 +135,154 @@ const pacote = computed(() => pacotesList.find(p => p.id === id));
   padding: 5px 15px;
   border-radius: 20px;
   cursor: pointer;
-  margin-bottom: 10px;
+  backdrop-filter: blur(5px);
 }
 
 .container {
-  max-width: 1200px;
+  max-width: 1000px;
   margin: -50px auto 0;
   padding: 0 20px;
   position: relative;
   z-index: 10;
 }
 
-.content-grid {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 30px;
-}
-
-.info-card {
-  background: white;
-  border-radius: 12px;
-  padding: 25px;
-  margin-bottom: 20px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-}
-
-.card-header h3 {
-  margin: 0;
-  color: #333;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 15px;
-  margin-bottom: 15px;
-}
-
-/* Voo Styles */
-.flight-route {
+.combo-details {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  background: #f9f9f9;
-  padding: 20px;
-  border-radius: 8px;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 40px;
 }
 
-.point {
-  display: flex;
-  flex-direction: column;
-}
-
-.time {
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #009688;
-}
-
-.line {
+.detail-card {
   flex: 1;
-  text-align: center;
-  border-bottom: 1px dashed #ccc;
-  margin: 0 20px;
-  position: relative;
-  top: -10px;
-}
-
-.duration {
-  display: block;
-  font-size: 0.8rem;
-  color: #666;
-  margin-bottom: 5px;
-}
-
-.obs {
-  margin-top: 10px;
-  font-size: 0.85rem;
-  color: #666;
-}
-
-/* Hotel Styles */
-.hotel-details h4 {
-  font-size: 1.2rem;
-  margin: 0 0 5px 0;
-}
-
-.amenities-list {
-  list-style: none;
-  padding: 0;
-  margin-top: 15px;
-  display: flex;
-  gap: 15px;
-}
-
-.amenities-list li {
-  background: #e0f2f1;
-  color: #00695c;
-  padding: 5px 10px;
-  border-radius: 4px;
-  font-size: 0.85rem;
-}
-
-/* Sidebar */
-.checkout-card {
   background: white;
   padding: 30px;
   border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  position: sticky;
-  top: 20px;
-}
-
-.price {
-  font-size: 2.5rem;
-  font-weight: 800;
-  color: #004d40;
-  margin: 10px 0;
-}
-
-.price small {
-  font-size: 1.2rem;
-}
-
-.details-list {
-  margin: 20px 0;
-  border-top: 1px solid #eee;
-  border-bottom: 1px solid #eee;
-  padding: 15px 0;
-}
-
-.row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 8px;
-  color: #555;
-}
-
-.btn-buy {
-  width: 100%;
-  background: #009688;
-  color: white;
-  border: none;
-  padding: 15px;
-  border-radius: 8px;
-  font-size: 1.1rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.btn-buy:hover {
-  background: #00796b;
-}
-
-.secure {
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
   text-align: center;
+  height: 250px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.icon-header {
+  background: #e0f2f1;
+  color: #00695c;
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  font-size: 0.9rem;
+}
+
+.detail-card h3 {
+  margin: 10px 0;
+  font-size: 1.4rem;
+  color: #333;
+}
+
+.obs {
   font-size: 0.8rem;
   color: #888;
   margin-top: 10px;
 }
 
+.plus-sign {
+  font-size: 3rem;
+  color: white;
+  font-weight: bold;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.tags {
+  margin-top: 15px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.tags span {
+  background: #fff3e0;
+  color: #e65100;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+.booking-section {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.price-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.price {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #009688;
+}
+
+.installments {
+  font-size: 0.8rem;
+  color: #888;
+}
+
+.btn-buy {
+  background: #00c3ff;
+  color: white;
+  border: none;
+  padding: 15px 40px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+  box-shadow: 0 4px 15px rgba(0, 195, 255, 0.4);
+}
+
+.btn-buy:hover {
+  transform: translateY(-3px);
+  background: #00b0e6;
+}
+
+.not-found {
+  text-align: center;
+  padding: 100px;
+}
+
 @media (max-width: 768px) {
-  .content-grid {
-    grid-template-columns: 1fr;
+  .combo-details {
+    flex-direction: column;
   }
 
-  .hero-header {
-    height: 250px;
+  .plus-sign {
+    color: #333;
+    transform: rotate(90deg);
+    margin: 10px 0;
+    text-shadow: none;
+  }
+
+  .booking-section {
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
   }
 }
 </style>

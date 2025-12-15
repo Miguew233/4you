@@ -87,7 +87,7 @@
       </div>
     </div>
 
-    <button class="search-btn">
+    <button class="search-btn" @click="handleSearch">
       Buscar destino ➜
     </button>
   </section>
@@ -202,6 +202,8 @@
 
 <script setup>
 import { ref, computed } from 'vue';
+import { useRouter } from 'vue-router'; // Importe isso!
+
 
 // 1. Imports do Swiper
 import { Swiper, SwiperSlide } from 'swiper/vue';
@@ -220,23 +222,46 @@ const modules = [Navigation];
 
 // Inicializar a Store
 const store = useTravelStore();
+const router = useRouter();
 
-// --- DADOS ---
+// --- DADOS DINÂMICOS DA HERO ---
+// Transforma os pacotes da Store em cards para o Banner
+const travelCards = computed(() => {
+  // Se não tiver pacotes, mostra um padrão pra não ficar vazio
+  if (store.pacotes.length === 0) {
+    return [
+      { city: "Confira nossas ofertas", date: "Datas flexíveis", price: "---", image: "https://i.imgur.com/r4ZQ0K4.jpeg" }
+    ];
+  }
 
-// Card Estático da Hero (Maceió, Fortaleza...)
-// (Esse mantemos local pois é específico só do banner da Home)
-const travelCards = ref([
-  { city: "Maceió", date: "28 de ago - 31 de ago", price: "1.629", image: "https://i.imgur.com/r4ZQ0K4.jpeg" },
-  { city: "Fortaleza", date: "17 de jun - 21 de jun", price: "1.927", image: "https://i.imgur.com/Ynk1xhK.jpeg" },
-  { city: "Rio de Janeiro", date: "06 de ago - 09 de ago", price: "535", image: "https://i.imgur.com/Y2s2ypU.jpeg" },
-  { city: "Oslo", date: "03 de jun - 09 de jun", price: "4.243", image: "https://i.imgur.com/aA3xzqg.jpeg" }
-]);
+  // Mapeia os pacotes reais
+  return store.pacotes.map(pacote => ({
+    city: pacote.title, // Ex: "Feriadão em Salvador"
+    date: `${pacote.days} dias de viagem`, // Ex: "5 dias de viagem"
+    price: pacote.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
+    image: pacote.image
+  }));
+});
+
+
+// ... outros refs
+
+// --- FUNÇÃO DE BUSCA ---
+const handleSearch = () => {
+  // Redireciona para /pacotes passando o destino na URL
+  // Ex: /pacotes?q=Paris
+  router.push({
+    path: '/pacotes',
+    query: { q: destination.value }
+  });
+};
 
 // --- DADOS DINÂMICOS VINDOS DA STORE ---
 // Aqui está a mudança: Não digitamos mais a lista gigante.
 // A Home apenas "observa" a store.
 const hoteisList = computed(() => store.hoteis);
 const passagensList = computed(() => store.passagens);
+// inputs (mantenha os refs)
 
 // Inputs refs (para os v-model funcionarem)
 const origin = ref('');

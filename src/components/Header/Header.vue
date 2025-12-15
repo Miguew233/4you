@@ -23,35 +23,57 @@
           </router-link>
         </li>
 
-        <li class="nav-item">
-          <router-link to="/sobre" class="nav-link">
-             Sobre Nós
+        <li class="nav-item" v-if="!store.currentUser">
+          <router-link to="/login" class="nav-link">
+            <img src="../../icons/Login.png" class="icon" /> Login
           </router-link>
         </li>
-
-        <li class="nav-item">
-          <a href="/login" class="nav-link">
-            <img src="../../icons/Login.png" class="icon" /> Login
-          </a>
+        <li class="nav-item" v-if="!store.currentUser">
+          <router-link to="/register" class="btn-registrar">Registrar</router-link>
         </li>
 
-        <li class="nav-item">
-          <a href="/register" class="btn-registrar">Registrar</a>
+        <li class="nav-item user-logged" v-else @click="goToProfile">
+          <div class="avatar-circle">
+            <img :src="store.userAvatar || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'" alt="Perfil" />
+          </div>
+          <span class="user-name">Olá, {{ primeiroNome }}</span>
+
+          <button class="btn-logout" @click.stop="handleLogout" title="Sair">
+            Logout
+          </button>
         </li>
+
       </ul>
-
     </div>
   </nav>
 </template>
 
 <script setup>
 import { computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
+import { useTravelStore } from '@/stores/travelStore'; // Importe a Store
 
 const route = useRoute();
+const router = useRouter();
+const store = useTravelStore();
 
-// Computada que retorna TRUE apenas se estivermos na página inicial
 const isHome = computed(() => route.path === '/');
+
+// Pega só o primeiro nome para não ocupar muito espaço
+const primeiroNome = computed(() => {
+  return store.currentUser?.nome?.split(' ')[0] || 'Viajante';
+});
+
+const goToProfile = () => {
+  router.push('/usuario/viagens'); // Ajuste para sua rota de perfil
+};
+
+const handleLogout = () => {
+  if (confirm("Deseja realmente sair?")) {
+    store.logout();
+    router.push('/');
+  }
+};
 </script>
 
 <style scoped>
@@ -145,30 +167,76 @@ const isHome = computed(() => route.path === '/');
   background-color: #0b70d3;
 }
 
+/* --- NOVOS ESTILOS DE USUÁRIO --- */
+.user-logged {
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 5px 15px 5px 5px;
+  border-radius: 30px;
+  transition: 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-logged:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.avatar-circle {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid white;
+  background: #eee;
+}
+
+.avatar-circle img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-name {
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.btn-logout {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  margin-left: 5px;
+  opacity: 0.7;
+  transition: 0.3s;
+  color: red;
+}
+
+.btn-logout:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* Mobile */
 @media (max-width: 768px) {
   .navbar-container {
     flex-direction: column;
-    /* Logo em cima, menu embaixo */
     gap: 15px;
   }
 
   .nav-menu {
     width: 100%;
     overflow-x: auto;
-
-    /* Permite rolar para o lado se não couber */
     padding-bottom: 10px;
-    /* Espaço para a barra de rolagem */
     justify-content: flex-start;
-    /* Alinha no começo */
   }
 
-  .nav-item {
-    flex-shrink: 0;
-    /* Impede que os itens esmaguem */
+  .avatar-circle {
+    width: 46px;
+    height: 35px;
   }
-
-  /* Esconde o texto e deixa só os ícones se quiser economizar espaço */
-  /* .nav-link span { display: none; } */
 }
 </style>

@@ -3,9 +3,7 @@
 
     <div class="page-header">
       <h2>🏨 Gerenciar Hotéis</h2>
-      <button class="btn-add" @click="showModal = true">
-        + Novo Hotel
-      </button>
+      <button class="btn-add" @click="openModal(null)">+ Novo Hotel</button>
     </div>
 
     <div class="table-container">
@@ -27,7 +25,7 @@
             <td class="price">R$ {{ hotel.price.toLocaleString('pt-BR') }}</td>
             <td>
               <div class="actions">
-                <button class="btn-edit">✏️</button>
+                <button class="btn-edit" @click="openModal(hotel)">✏️</button>
                 <button class="btn-delete" @click="deleteHotel(hotel.id)">🗑️</button>
               </div>
             </td>
@@ -40,7 +38,7 @@
       </div>
     </div>
 
-    <HotelFormModal v-if="showModal" @close="showModal = false" />
+    <HotelFormModal v-if="showModal" :hotelToEdit="selectedHotel" @close="showModal = false" />
 
   </div>
 </template>
@@ -48,16 +46,19 @@
 <script setup>
 import { ref } from 'vue';
 import { useTravelStore } from '@/stores/travelStore';
-// Importe o componente do Modal
-import HotelFormModal from './HotelFormModal.vue';
+import HotelFormModal from './HotelFormModal.vue'; // Verifique o caminho correto
 
 const store = useTravelStore();
-
-// Controle de exibição do modal
 const showModal = ref(false);
+const selectedHotel = ref(null);
+
+const openModal = (hotel) => {
+  selectedHotel.value = hotel; // Se for null, é criação. Se tiver objeto, é edição.
+  showModal.value = true;
+};
 
 const deleteHotel = (id) => {
-  if (confirm('Tem certeza que deseja excluir este hotel?')) {
+  if (confirm('Tem certeza?')) {
     const index = store.hoteis.findIndex(h => h.id === id);
     if (index !== -1) store.hoteis.splice(index, 1);
   }

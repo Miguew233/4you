@@ -2,59 +2,59 @@
   <div class="packages-page">
     <header class="page-header">
       <div class="header-content">
-        <h1>📦 Pacotes de Viagem</h1>
-        <p>A combinação perfeita de Aéreo + Hotel com preços imperdíveis</p>
+        <h1 v-if="searchQuery">🔍 Buscando por: "{{ searchQuery }}"</h1>
+        <h1 v-else>📦 Pacotes de Viagem</h1>
+
+        <p v-if="!searchQuery">A combinação perfeita de Aéreo + Hotel</p>
+        <button v-else @click="clearSearch" style="margin-top:10px; cursor:pointer;">Limpar busca</button>
       </div>
     </header>
 
     <div class="container">
       <div class="cards-grid">
-        <PackageCard v-for="pacote in pacotesList" :key="pacote.id" :info="pacote" />
+        <PackageCard v-for="pacote in filteredPacotes" :key="pacote.id" :info="pacote" />
+      </div>
+
+      <div v-if="filteredPacotes.length === 0" class="empty-state">
+        Nenhum pacote encontrado para "{{ searchQuery }}". 😢
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { computed } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useTravelStore } from '@/stores/travelStore';
 import PackageCard from '@/components/Cards/PackageCard.vue';
 
-// DADOS MOCKADOS (Simulando o que viria do Admin)
-const pacotesList = ref([
-  {
-    id: 900,
-    title: "Feriadão em Salvador",
-    price: 2450.00,
-    image: "https://images.unsplash.com/photo-1512753360377-5435e1657c7c?auto=format&fit=crop&w=400&q=80",
-    days: 5,
-    persons: 2,
-    hotel: { name: "Resort Bahia", stars: 5, location: "Salvador, BA" },
-    flight: { origin: "São Paulo (GRU)", destination: "Salvador (SSA)" }
-  },
-  {
-    id: 901,
-    title: "Eurotrip Paris Romântica",
-    price: 6890.00,
-    image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=400&q=80",
-    days: 7,
-    persons: 2,
-    hotel: { name: "Paris Luxury", stars: 4, location: "Paris, França" },
-    flight: { origin: "Rio de Janeiro (GIG)", destination: "Paris (CDG)" }
-  },
-  {
-    id: 902,
-    title: "Miami Beach Experience",
-    price: 4200.00,
-    image: "https://images.unsplash.com/photo-1535498730771-e735b998cd64?auto=format&fit=crop&w=400&q=80",
-    days: 6,
-    persons: 2,
-    hotel: { name: "EVEN Hotel Miami", stars: 4, location: "Miami, EUA" },
-    flight: { origin: "São Paulo (GRU)", destination: "Miami (MIA)" }
-  }
-]);
+const store = useTravelStore();
+const route = useRoute();
+const router = useRouter();
+
+// Pega o termo da busca da URL (Ex: ?q=Paris)
+const searchQuery = computed(() => route.query.q || '');
+
+// Filtra a lista da store
+const filteredPacotes = computed(() => {
+  // Se não tem busca, retorna tudo
+  if (!searchQuery.value) return store.pacotesCompletos;
+
+  // Se tem busca, filtra pelo título
+  const termo = searchQuery.value.toLowerCase();
+  return store.pacotesCompletos.filter(p =>
+    p.title.toLowerCase().includes(termo) ||
+    p.hotel.location.toLowerCase().includes(termo)
+  );
+});
+
+const clearSearch = () => {
+  router.push('/pacotes'); // Remove a query da URL
+};
 </script>
 
 <style scoped>
+/* (Mantenha seus estilos) */
 .packages-page {
   font-family: 'Montserrat', sans-serif;
   background: #f4f4f4;

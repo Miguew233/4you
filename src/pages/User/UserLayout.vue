@@ -3,9 +3,12 @@
 
     <aside class="user-sidebar">
       <div class="profile-summary">
-        <img :src="store.currentUser.avatar" class="avatar" />
-        <h4>{{ store.currentUser.name }}</h4>
-        <p>Membro desde {{ new Date(store.currentUser.joined).getFullYear() }}</p>
+        <img :src="store.userAvatar || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'" class="avatar" />
+        <h4>{{ store.currentUser?.nome }}</h4>
+        <p v-if="store.currentUser?.joined">
+          Membro desde {{ new Date(store.currentUser.joined).getFullYear() }}
+        </p>
+        <p v-else>Bem-vindo!</p>
       </div>
 
       <nav class="user-nav">
@@ -34,6 +37,7 @@ const store = useTravelStore();
 </script>
 
 <style scoped>
+/* (Mantenha o CSS que você já tinha, está ótimo) */
 .user-layout {
   display: flex;
   min-height: 100vh;
@@ -53,6 +57,7 @@ const store = useTravelStore();
 .profile-summary {
   text-align: center;
   margin-bottom: 40px;
+  margin: 0 auto 30px auto;
 }
 
 .avatar {
@@ -60,7 +65,7 @@ const store = useTravelStore();
   height: 100px;
   border-radius: 50%;
   object-fit: cover;
-  margin-bottom: 10px;
+  margin: 0 0 10px 55px;
   border: 3px solid #00c3ff;
 }
 
@@ -105,7 +110,6 @@ const store = useTravelStore();
   overflow-y: auto;
 }
 
-/* Mobile */
 @media (max-width: 768px) {
   .user-layout {
     flex-direction: column;

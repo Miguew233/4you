@@ -11,13 +11,7 @@
           <label for="nome">Nome Completo</label>
           <div class="input-group">
             <i class="fas fa-user"></i>
-            <input
-              type="text"
-              id="nome"
-              v-model="formData.nome"
-              required
-              aria-describedby="nomeHelp"
-            />
+            <input type="text" id="nome" v-model="formData.nome" required aria-describedby="nomeHelp" />
           </div>
         </div>
 
@@ -25,13 +19,7 @@
           <label for="email">Email</label>
           <div class="input-group">
             <i class="fas fa-envelope"></i>
-            <input
-              type="email"
-              id="email"
-              v-model="formData.email"
-              required
-              aria-describedby="emailHelp"
-            />
+            <input type="email" id="email" v-model="formData.email" required aria-describedby="emailHelp" />
           </div>
         </div>
 
@@ -39,12 +27,7 @@
           <label for="telefone">Telefone</label>
           <div class="input-group">
             <i class="fas fa-phone"></i>
-            <input
-              type="tel"
-              id="telefone"
-              v-model="formData.telefone"
-              aria-describedby="telefoneHelp"
-            />
+            <input type="tel" id="telefone" v-model="formData.telefone" aria-describedby="telefoneHelp" />
           </div>
         </div>
 
@@ -52,13 +35,7 @@
           <label for="senha">Senha</label>
           <div class="input-group">
             <i class="fas fa-lock"></i>
-            <input
-              type="password"
-              id="senha"
-              v-model="formData.senha"
-              required
-              aria-describedby="senhaHelp"
-            />
+            <input type="password" id="senha" v-model="formData.senha" required aria-describedby="senhaHelp" />
           </div>
         </div>
 
@@ -66,23 +43,12 @@
           <label for="confirmaSenha">Confirmar Senha</label>
           <div class="input-group">
             <i class="fas fa-lock"></i>
-            <input
-              type="password"
-              id="confirmaSenha"
-              v-model="formData.confirmaSenha"
-              required
-              aria-describedby="confirmaSenhaHelp"
-            />
+            <input type="password" id="confirmaSenha" v-model="formData.confirmaSenha" required
+              aria-describedby="confirmaSenhaHelp" />
           </div>
         </div>
 
-        <button
-          type="submit"
-          class="btn"
-          :class="{ loading: isLoading }"
-          id="registerBtn"
-          :disabled="isLoading"
-        >
+        <button type="submit" class="btn" :class="{ loading: isLoading }" id="registerBtn" :disabled="isLoading">
           Cadastrar
         </button>
       </form>
@@ -111,6 +77,7 @@ export default {
   },
   methods: {
     async handleSubmit() {
+      // 1. Validação básica de senha
       if (this.formData.senha !== this.formData.confirmaSenha) {
         alert('As senhas não coincidem!');
         return;
@@ -118,16 +85,38 @@ export default {
 
       this.isLoading = true;
 
-      // Simulação de envio (substitua por lógica real de API)
+      // 2. Prepara os dados para o formato que o Java aceita
+      // O Java exige CPF e Endereço, então vamos mandar "fake" se o usuário não digitar
+      const clienteParaOJava = {
+        nome: this.formData.nome,
+        email: this.formData.email,
+        telefone: this.formData.telefone,
+        cpf: "000.000.000-00", // Valor padrão para passar na validação
+        endereco: "Cadastro pelo Site" // Valor padrão
+      };
+
       try {
-        // Exemplo: await this.$axios.post('/api/register', this.formData);
-        console.log('Dados enviados:', this.formData);
-        alert('Cadastro realizado com sucesso!');
-        // Redirecionar ou limpar formulário
-        this.resetForm();
+        // 3. Envia para a API Java
+        const response = await fetch('http://localhost:8080/cliente', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(clienteParaOJava)
+        });
+
+        if (response.ok) {
+          alert('Cadastro realizado com sucesso! 🎉');
+          // Redireciona para o login
+          this.$router.push('/login');
+          this.resetForm();
+        } else {
+          alert('Erro ao salvar no sistema. Verifique os dados.');
+        }
+
       } catch (error) {
         console.error('Erro no cadastro:', error);
-        alert('Erro ao cadastrar. Tente novamente.');
+        alert('Erro de conexão com o servidor.');
       } finally {
         this.isLoading = false;
       }
@@ -146,9 +135,6 @@ export default {
 </script>
 
 <style scoped>
-/* Inclua o Font Awesome via CDN no index.html do seu projeto Vue ou instale via npm */
-/* Exemplo: <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"> */
-
 * {
   margin: 0;
   padding: 0;
@@ -173,7 +159,8 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 99, 45, 0.1); /* Overlay sutil para melhor legibilidade */
+  background: rgba(0, 99, 45, 0.1);
+  /* Overlay sutil para melhor legibilidade */
   z-index: -1;
 }
 
@@ -186,7 +173,8 @@ export default {
   padding: 50px 40px;
   position: relative;
   z-index: 1;
-  backdrop-filter: blur(10px); /* Efeito de vidro para modernidade */
+  backdrop-filter: blur(10px);
+  /* Efeito de vidro para modernidade */
 }
 
 .header {
@@ -225,7 +213,8 @@ label {
 
 input {
   width: 100%;
-  padding: 15px 15px 15px 45px; /* Espaço para ícones */
+  padding: 15px 15px 15px 45px;
+  /* Espaço para ícones */
   border: 2px solid #ddd;
   border-radius: 8px;
   font-size: 16px;
@@ -294,8 +283,13 @@ input:focus {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .footer {
@@ -331,9 +325,11 @@ input:focus {
     max-width: 90%;
     padding: 30px 20px;
   }
+
   .header h1 {
     font-size: 28px;
   }
+
   .btn {
     font-size: 16px;
   }

@@ -8,14 +8,7 @@
           <label for="email">Email ou Usuário</label>
           <div class="input-group">
             <i class="fas fa-user"></i>
-            <input
-              type="text"
-              id="email"
-              v-model="form.email"
-              name="email"
-              required
-              aria-describedby="emailHelp"
-            >
+            <input type="text" id="email" v-model="form.email" name="email" required aria-describedby="emailHelp">
           </div>
         </div>
 
@@ -23,14 +16,7 @@
           <label for="senha">Senha</label>
           <div class="input-group">
             <i class="fas fa-lock"></i>
-            <input
-              type="password"
-              id="senha"
-              v-model="form.senha"
-              name="senha"
-              required
-              aria-describedby="senhaHelp"
-            >
+            <input type="password" id="senha" v-model="form.senha" name="senha" required aria-describedby="senhaHelp">
           </div>
         </div>
 
@@ -49,6 +35,7 @@
 </template>
 
 <script>
+import { useTravelStore } from '@/stores/travelStore';
 export default {
   name: 'LoginPage',
   data() {
@@ -61,14 +48,67 @@ export default {
     }
   },
   methods: {
-    handleLogin() {
+    // ... dentro de methods: ...
+
+    async handleLogin() {
       this.isLoading = true;
-      // Simulação de login (substitua por lógica real)
-      setTimeout(() => {
+
+      try {
+        // 1. Busca usuários da API (Mantemos a lógica anterior)
+        const response = await fetch('http://localhost:8080/cliente');
+        const clientes = await response.json();
+
+        // 2. Verifica se é o ADMIN "Supremo" (Hardcoded para o TCC)
+        if (this.form.email === 'admin@4you.com' && this.form.senha === 'admin123') {
+
+          const adminUser = {
+            id: 999,
+            nome: "Administrador Chefe",
+            email: "admin@4you.com",
+            role: 'admin', // <--- A CHAVE MÁGICA
+            avatar: 'https://cdn-icons-png.flaticon.com/512/2942/2942813.png'
+          };
+
+          const store = useTravelStore(); // Lembre de importar useTravelStore se não estiver usando setup script
+          // Se estiver usando Options API, use this.store ou mapActions
+          // No seu código anterior parecia Options API, então talvez precise importar a store fora do export default
+          // Mas para garantir, vou assumir que você consegue acessar a store.
+
+          // Se seu componente for Options API padrão:
+          // import { useTravelStore } from '@/stores/travelStore';
+          // const store = useTravelStore();
+
+          store.login(adminUser);
+          alert('Bem-vindo ao Painel, Chefe! 👔');
+          this.$router.push('/admin'); // Manda direto pro Admin
+          this.isLoading = false;
+          return;
+        }
+
+        // 3. Login Normal (Clientes)
+        const usuarioEncontrado = clientes.find(c => c.email === this.form.email);
+
+        if (usuarioEncontrado) {
+          // Adiciona role 'user' padrão
+          usuarioEncontrado.role = 'user';
+
+          // Acessando a store (se estiver usando Options API, certifique-se de ter acesso)
+          // Sugestão rápida: Importe a store no topo do <script>
+          const store = useTravelStore();
+          store.login(usuarioEncontrado);
+
+          alert(`Bem-vindo de volta, ${usuarioEncontrado.nome}! ✈️`);
+          this.$router.push('/');
+        } else {
+          alert('Usuário não encontrado!');
+        }
+
+      } catch (error) {
+        console.error("Erro:", error);
+        alert("Erro de conexão.");
+      } finally {
         this.isLoading = false;
-        alert('Login simulado! Redirecionar para dashboard.');
-        // Exemplo: this.$router.push('/dashboard');
-      }, 2000);
+      }
     }
   }
 }
@@ -99,7 +139,8 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 99, 45, 0.1); /* Overlay sutil para melhor legibilidade */
+  background: rgba(0, 99, 45, 0.1);
+  /* Overlay sutil para melhor legibilidade */
   z-index: -1;
 }
 
@@ -112,7 +153,8 @@ export default {
   padding: 50px 40px;
   position: relative;
   z-index: 1;
-  backdrop-filter: blur(10px); /* Efeito de vidro para modernidade */
+  backdrop-filter: blur(10px);
+  /* Efeito de vidro para modernidade */
 }
 
 .logo {
@@ -143,7 +185,8 @@ label {
 
 input {
   width: 100%;
-  padding: 15px 15px 15px 45px; /* Espaço para ícones */
+  padding: 15px 15px 15px 45px;
+  /* Espaço para ícones */
   border: 2px solid #ddd;
   border-radius: 8px;
   font-size: 16px;
@@ -212,8 +255,13 @@ button.loading::after {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .links {
@@ -248,9 +296,11 @@ button.loading::after {
     max-width: 90%;
     padding: 30px 20px;
   }
+
   .logo {
     font-size: 28px;
   }
+
   button {
     font-size: 16px;
   }

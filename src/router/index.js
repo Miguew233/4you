@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useTravelStore } from '@/stores/travelStore';
 import Home from '../pages/Home/Home.vue'
 import Details from '../pages/Details/Details.vue'
 // Importe as novas páginas
@@ -23,6 +24,8 @@ import ManagePackages from '@/pages/Admin/ManagePackages.vue'
 import UserLayout from '@/pages/User/UserLayout.vue';
 import MyBookings from '@/pages/User/MyBookings.vue';
 import UserProfile from '@/pages/User/UserProfile.vue';
+
+
 const routes = [
   { path: '/', name: 'Home', component: Home },
 
@@ -43,6 +46,7 @@ const routes = [
   {
     path: '/admin',
     component: AdminLayout, // O pai carrega o Layout (Sidebar)
+    meta: { requiresAdmin: true },
     children: [
       {
         path: '', // Quando for apenas /admin
@@ -79,9 +83,32 @@ const routes = [
   }
 ]
 
+
+
 const router = createRouter({
   history: createWebHistory(),
   routes
 })
+
+
+router.beforeEach((to, from, next) => {
+  const store = useTravelStore();
+  const user = store.currentUser;
+
+  // 1. Verifica se a rota precisa de Admin
+  if (to.matched.some(record => record.meta.requiresAdmin)) {
+
+    // Se não tem usuário ou o role não é admin
+    if (!user || user.role !== 'admin') {
+      alert("Acesso Negado! Área restrita para administradores. 🚫");
+      next('/'); // Manda pra Home
+    } else {
+      next(); // Pode passar, chefe
+    }
+
+  } else {
+    next(); // Rota pública, segue o jogo
+  }
+});
 
 export default router

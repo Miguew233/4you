@@ -1,11 +1,19 @@
 import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 
 export const useTravelStore = defineStore('travel', () => {
 
-  // --- 1. STATE (Dados Centrais) ---
+  // --- FUNÇÕES AUXILIARES DE PERSISTÊNCIA ---
+  // Tenta pegar do LocalStorage, se não tiver, usa o valor padrão
+  const loadFromStorage = (key, defaultValue) => {
+    const stored = localStorage.getItem(key);
+    return stored ? JSON.parse(stored) : defaultValue;
+  };
 
-  const hoteis = ref([
+  // --- 1. STATE (Dados com Memória) ---
+
+  // HOTÉIS
+  const hoteis = ref(loadFromStorage('db_hoteis', [
     { id: 1, type: 'hotel', name: "Hotel Golden Vilage", location: "São Paulo, SP", image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=400&q=80", price: 616.00, days: 4, guests: 2, hasBreakfast: true, hasWifi: true },
     { id: 2, type: 'hotel', name: "Majestic Palace Hotel", location: "Florianópolis, SC", image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=400&q=80", price: 2185.00, days: 7, guests: 2, hasBreakfast: true, hasWifi: true },
     { id: 3, type: 'hotel', name: "Crowne Plaza LA", location: "Los Angeles, EUA", image: "https://images.unsplash.com/photo-1564501049412-61c2a3083791?auto=format&fit=crop&w=400&q=80", price: 4152.00, days: 7, guests: 2, hasBreakfast: false, hasWifi: true },
@@ -13,9 +21,10 @@ export const useTravelStore = defineStore('travel', () => {
     { id: 5, type: 'hotel', name: "Grand Hyatt Rio", location: "Rio de Janeiro, RJ", image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=400&q=80", price: 1540.00, days: 3, guests: 2, hasBreakfast: true, hasWifi: true },
     { id: 6, type: 'hotel', name: "Nord Luxxor", location: "João Pessoa, PB", image: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=400&q=80", price: 980.00, days: 5, guests: 2, hasBreakfast: true, hasWifi: true },
     { id: 7, type: 'hotel', name: "Hotel Riu Plaza", location: "Nova York, EUA", image: "https://images.unsplash.com/photo-1496417263034-38ec4f0d665a?auto=format&fit=crop&w=400&q=80", price: 5200.00, days: 6, guests: 2, hasBreakfast: false, hasWifi: true }
-  ]);
+  ]));
 
-  const passagens = ref([
+  // PASSAGENS
+  const passagens = ref(loadFromStorage('db_passagens', [
     { id: 101, type: 'flight', name: "São Paulo", location: "Saindo de Brasília", image: "https://images.unsplash.com/photo-1543059080-f9b1272213d5?auto=format&fit=crop&w=400&q=80", price: 169.00, oldPrice: 229.00, discount: "23% OFF" },
     { id: 102, type: 'flight', name: "Florianópolis", location: "Saindo de São Paulo", image: "https://images.unsplash.com/photo-1596484552834-6a58f850e0a1?auto=format&fit=crop&w=400&q=80", price: 250.00, oldPrice: 380.00, discount: "34% OFF" },
     { id: 103, type: 'flight', name: "Los Angeles", location: "Saindo de SP", image: "https://images.unsplash.com/photo-1534190239940-9ba8944ea261?auto=format&fit=crop&w=400&q=80", price: 1118.00, oldPrice: 1559.00, discount: "28% OFF" },
@@ -23,9 +32,10 @@ export const useTravelStore = defineStore('travel', () => {
     { id: 105, type: 'flight', name: "Paris", location: "Saindo de SP", image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=400&q=80", price: 2890.00, oldPrice: 3500.00, discount: "17% OFF" },
     { id: 106, type: 'flight', name: "Lisboa", location: "Saindo de Recife", image: "https://images.unsplash.com/photo-1555881400-74d7acaacd81?auto=format&fit=crop&w=400&q=80", price: 3100.00, oldPrice: 4200.00, discount: "26% OFF" },
     { id: 107, type: 'flight', name: "Buenos Aires", location: "Saindo de Porto Alegre", image: "https://images.unsplash.com/photo-1589909202802-8f4aadce1849?auto=format&fit=crop&w=400&q=80", price: 890.00, oldPrice: 1200.00, discount: "25% OFF" }
-  ]);
+  ]));
 
-  const pacotes = ref([
+  // PACOTES
+  const pacotes = ref(loadFromStorage('db_pacotes', [
     {
       id: 900,
       title: "Feriadão em Salvador",
@@ -46,21 +56,36 @@ export const useTravelStore = defineStore('travel', () => {
       hotelId: 5,
       flightId: 105
     }
-  ]);
+  ]));
 
-  // --- 2. GETTERS (Filtros Inteligentes) ---
+  // --- OBSERVADORES (Salvar automaticamente quando mudar) ---
+  watch(hoteis, (newVal) => localStorage.setItem('db_hoteis', JSON.stringify(newVal)), { deep: true });
+  watch(passagens, (newVal) => localStorage.setItem('db_passagens', JSON.stringify(newVal)), { deep: true });
+  watch(pacotes, (newVal) => localStorage.setItem('db_pacotes', JSON.stringify(newVal)), { deep: true });
+
+  // --- USUÁRIOS E SESSÃO ---
+  const currentUser = ref(JSON.parse(localStorage.getItem('usuarioLogado')) || null);
+  const userAvatar = ref(localStorage.getItem(`avatar_${currentUser.value?.email}`) || null);
+  const reservas = ref(loadFromStorage('db_reservas', [])); // Também salvamos as reservas!
+  const reviews = ref(loadFromStorage('db_reviews', [
+    { id: 1, itemId: 1, type: 'hotel', userName: "Ana Clara", rating: 5, comment: "Hotel maravilhoso!", date: "2023-10-15" }
+  ]));
+
+  watch(reservas, (newVal) => localStorage.setItem('db_reservas', JSON.stringify(newVal)), { deep: true });
+  watch(reviews, (newVal) => localStorage.setItem('db_reviews', JSON.stringify(newVal)), { deep: true });
+
+  // --- GETTERS ---
   const pacotesCompletos = computed(() => {
     return pacotes.value.map(pct => {
       return {
         ...pct,
-        // Procura o objeto completo baseado no ID salvo
-        hotel: hoteis.value.find(h => h.id === pct.hotelId) || { name: 'Hotel não encontrado' },
-        flight: passagens.value.find(f => f.id === pct.flightId) || { origin: 'Indisponível', destination: 'Indisponível' }
+        hotel: hoteis.value.find(h => h.id === pct.hotelId) || { name: 'Hotel removido' },
+        flight: passagens.value.find(f => f.id === pct.flightId) || { name: 'Voo removido', location: '' }
       }
     })
   });
 
-  // --- 3. ACTIONS (Funções) ---
+  // --- ACTIONS ---
 
   function addHotel(novoHotel) {
     novoHotel.id = Date.now();
@@ -74,106 +99,97 @@ export const useTravelStore = defineStore('travel', () => {
     passagens.value.push(novaPassagem);
   }
 
-  // --- AQUI ESTAVA FALTANDO! A FUNÇÃO DE CRIAR PACOTE ---
   function addPacote(novoPacote) {
     novoPacote.id = Date.now();
-    // Garante que o ID venha como número (caso o select mande string)
     novoPacote.hotelId = Number(novoPacote.hotelId);
     novoPacote.flightId = Number(novoPacote.flightId);
-
     pacotes.value.push(novoPacote);
   }
 
-  // --- DADOS DO USUÁRIO (MOCK) ---
-  const currentUser = ref({
-    id: 1,
-    name: "João Viajante",
-    email: "joao@email.com",
-    avatar: "https://i.pravatar.cc/150?img=11", // Foto aleatória
-    joined: "2023-01-15"
-  });
+  function login(userData) {
+    currentUser.value = userData;
+    localStorage.setItem('usuarioLogado', JSON.stringify(userData));
+    userAvatar.value = localStorage.getItem(`avatar_${userData.email}`);
+  }
 
-  // --- RESERVAS (COMPRAS) ---
-  const reservas = ref([
-    {
-      id: 501,
-      type: 'pacote', // ou 'hotel' ou 'voo'
-      itemId: 900,    // ID do Pacote (Feriadão em Salvador)
-      date: '2025-02-10', // Data da compra
-      status: 'confirmado', // confirmado, concluido, cancelado
-      price: 2450.00
-    },
-    {
-      id: 502,
-      type: 'hotel',
-      itemId: 3, // Crowne Plaza
-      date: '2024-12-01',
-      status: 'concluido', // Já viajou (Pode avaliar!)
-      price: 4152.00,
-      review: null // Ainda não avaliou
+  function logout() {
+    currentUser.value = null;
+    userAvatar.value = null;
+    localStorage.removeItem('usuarioLogado');
+    window.location.reload();
+  }
+
+  function updateAvatar(base64Image) {
+    if (currentUser.value) {
+      userAvatar.value = base64Image;
+      localStorage.setItem(`avatar_${currentUser.value.email}`, base64Image);
     }
-  ]);
+  }
 
-  // --- AVALIAÇÕES GERAIS ---
-  // Adicione isso para já ter avaliações aparecendo na apresentação
-  const reviews = ref([
-    { id: 1, itemId: 1, type: 'hotel', userName: "Ana Clara", rating: 5, comment: "Hotel maravilhoso, café da manhã top!", date: "2023-10-15" },
-    { id: 2, itemId: 1, type: 'hotel', userName: "Carlos B.", rating: 4, comment: "Muito bom, mas o wifi oscilou.", date: "2023-11-02" },
-    { id: 3, itemId: 101, type: 'flight', userName: "Marcos S.", rating: 5, comment: "Voo tranquilo e no horário.", date: "2023-09-20" }
-  ]);
+  function confirmBooking(item, type) {
+    const novaReserva = {
+      id: Date.now(),
+      type: type,
+      itemId: item.id,
+      date: new Date().toLocaleDateString('pt-BR'),
+      status: 'confirmado',
+      price: item.price,
+      review: null,
+      itemSnapshot: item
+    };
+    reservas.value.push(novaReserva);
+  }
 
-  // --- ACTIONS ---
   function addReview(reservaId, reviewData) {
-    // 1. Encontra a reserva
     const reserva = reservas.value.find(r => r.id === reservaId);
     if (reserva) {
-      reserva.review = reviewData; // Salva na reserva que já foi avaliado
-
-      // 2. Salva na lista global de reviews (para mostrar na Home futuramente)
+      reserva.review = reviewData;
       reviews.value.push({
         id: Date.now(),
         userId: currentUser.value.id,
-        userName: currentUser.value.name,
-        userAvatar: currentUser.value.avatar,
+        userName: currentUser.value.nome,
         ...reviewData,
         itemId: reserva.itemId,
         type: reserva.type
       });
     }
-  };
-
-  // --- ACTION DE COMPRA SIMPLIFICADA (TCC MODE) ---
-  function confirmBooking(item, type) {
-    // Cria o objeto da reserva
-    const novaReserva = {
-      id: Date.now(),
-      type: type, // 'hotel', 'voo', 'pacote'
-      itemId: item.id,
-      date: new Date().toLocaleDateString('pt-BR'), // Data de hoje
-      status: 'confirmado',
-      price: item.price,
-      review: null,
-      // Salva uma cópia do item para facilitar a exibição na lista
-      itemSnapshot: item
-    };
-
-    reservas.value.push(novaReserva);
   }
 
+  // --- INTEGRAÇÃO COM JAVA (Somente Cliente) ---
+  async function createClientAPI(userData) {
+    try {
+      const response = await fetch('http://localhost:8080/cliente', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData)
+      });
+      if (response.ok) {
+        alert("Cliente salvo no Banco de Dados com Sucesso! 🚀");
+      } else {
+        alert("Erro ao salvar no Java 😢");
+      }
+    } catch (error) {
+      console.error("Erro de conexão:", error);
+      alert("O Java está desligado? Não consegui conectar.");
+    }
+  }
 
+  function updateHotel(hotelAtualizado) {
+    const index = hoteis.value.findIndex(h => h.id === hotelAtualizado.id);
+    if (index !== -1) {
+      // Substitui o antigo pelo novo
+      hoteis.value[index] = hotelAtualizado;
+    }
+  }
+
+  function deletePacote(id) {
+    const index = pacotes.value.findIndex(p => p.id === id);
+    if (index !== -1) pacotes.value.splice(index, 1);
+  }
 
   return {
-    hoteis,
-    passagens,
-    pacotes,
-    pacotesCompletos,
-    addHotel,
-    addPassagem,
-    addPacote,
-    addReview,
-    currentUser,
-    reservas,
-    reviews,
-    confirmBooking
+    hoteis, passagens, pacotes, pacotesCompletos, currentUser, userAvatar, reservas, reviews,
+    addHotel, addPassagem, addPacote, login, logout, updateAvatar, confirmBooking, addReview, createClientAPI,
+    updateHotel, deletePacote
   };
 });
